@@ -1,10 +1,12 @@
 package com.controller;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,16 +22,35 @@ public class VilleController {
 	
 	@GetMapping(value = "/ville")
 	@ResponseBody
-	public ArrayList<Ville> get(@RequestParam(required = false, value="codePostal") String codePostal) {
-//		http://localhost:8181/ville?codePostal=01400
-		System.out.println("get");
-		System.out.println("get 2");
-				
+	public List<Ville> getVille(@RequestParam(required = true, value="codePostal") String codePostal) {
 		return villeBLOService.getInfoVilles(codePostal);
 	}
 	
-//	@PostMapping(value = "ville")
-//	@ResponseBody  //pour renvoyer JSON
-//	public Ville addVille()
+	@PostMapping(value = "ville/postVille")
+	@ResponseBody 
+	public String postVille(@RequestParam(required = true, value="codeCommune") String codeCommune,
+			@RequestParam(required = true, value="nom") String nom,
+			@RequestParam(required = true, value="codePostal") String codePostal,
+			@RequestParam(required = true, value="libelle") String libelle,
+			@RequestParam(required = false, value="ligne") String ligne,
+			@RequestParam(required = true, value="latitude") String latitude,
+			@RequestParam(required = true, value="longitude") String longitude) {
+		
+			return villeBLOService.addVille(codeCommune, nom, codePostal, libelle, ligne, latitude, longitude);
+	}
+	
+	@PutMapping(value = "ville/putVille")
+	@ResponseBody 
+	public String putVille(@RequestParam(required = true, value="codeCommune") String codeCommune,
+			@RequestParam(required = true, value="nom") String nom) {
+		
+			return villeBLOService.updateVille(codeCommune, nom);
+	}
+	
+	@DeleteMapping(value = "ville/deleteVille")
+	@ResponseBody 
+	public String deleteVille(@RequestParam(required = true, value="codeCommune") String codeCommune) {
+			return villeBLOService.removeVille(codeCommune);
+	}
 
 }

@@ -23,7 +23,8 @@ public class Ville implements Serializable {
 	private String codeCommune;
 	private String nomCommune;
 	private String codePostal;
+	private String libelleAcheminement;
 	private String ligne;
-	private String coordonnee;
+	private Coordonnee coordonnee;
 	
 }
