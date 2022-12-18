@@ -22,8 +22,8 @@ public class VilleController {
 	
 	@GetMapping(value = "/ville")
 	@ResponseBody
-	public List<Ville> getVille(@RequestParam(required = true, value="codePostal") String codePostal) {
-		return villeBLOService.getInfoVilles(codePostal);
+	public List<Ville> getVille(@RequestParam(required = false, value="codeCommune") String codeCommune) {
+		return villeBLOService.getInfoVilles(codeCommune);
 	}
 	
 	@PostMapping(value = "ville/postVille")
@@ -42,15 +42,20 @@ public class VilleController {
 	@PutMapping(value = "ville/putVille")
 	@ResponseBody 
 	public String putVille(@RequestParam(required = true, value="codeCommune") String codeCommune,
-			@RequestParam(required = true, value="nom") String nom) {
-		
-			return villeBLOService.updateVille(codeCommune, nom);
+	                       @RequestParam(required = true, value="nomCommune") String nomCommune,
+	                       @RequestParam(required = true, value="codePostal") String codePostal,
+	                       @RequestParam(required = true, value="libelleAcheminement") String libelleAcheminement,
+	                       @RequestParam(required = true, value="ligne") String ligne,
+	                       @RequestParam(required = true, value="latitude") String latitude,
+	                       @RequestParam(required = true, value="longitude") String longitude) {
+	    return villeBLOService.updateVille(codeCommune, nomCommune, codePostal, libelleAcheminement, ligne, latitude, longitude);
 	}
 	
 	@DeleteMapping(value = "ville/deleteVille")
 	@ResponseBody 
 	public String deleteVille(@RequestParam(required = true, value="codeCommune") String codeCommune) {
 			return villeBLOService.removeVille(codeCommune);
-	}
+	}	
+	
 
 }

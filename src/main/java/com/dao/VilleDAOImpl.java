@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.dto.Coordonnee;
 import com.dto.Ville;
@@ -48,8 +49,8 @@ public class VilleDAOImpl implements VilleDAO {
 						Ville ville = new Ville();
 						ville.setCodeCommune(result.getString(CODE_COMMUNE));
 						ville.setNomCommune(result.getString(NOM));
-						ville.setCodePostal(CODE_POSTAL);
-						ville.setLibelleAcheminement(LIBELLE_ACHEMINEMENT);
+						ville.setCodePostal(result.getString(CODE_POSTAL));
+						ville.setLibelleAcheminement(result.getString(LIBELLE_ACHEMINEMENT));
 						ville.setLigne(result.getString(LIGNE));
 						Coordonnee coord = new Coordonnee(result.getString(LATITUDE), result.getString(LONGITUDE));
 						ville.setCoordonnee(coord);
@@ -63,24 +64,24 @@ public class VilleDAOImpl implements VilleDAO {
 		return villeList;
 	}
 	
-	public List<Ville> findVilleByPostalCode(String postalCode) {
+	public List<Ville> findVilleByCodeCommune(String codeCommune) {
 		
-		String sql = "SELECT * FROM ville_france WHERE Code_Postal = ?;";
+		String sql = "SELECT * FROM ville_france WHERE Code_commune_INSEE = ?;";
 		List<Ville> villeList = new ArrayList<>();
 
 		try (Connection connection = daoFactory.getConnection()) {
 			
 			try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-				preparedStatement.setString(1, postalCode);
+				preparedStatement.setString(1, codeCommune);
 
 				try (ResultSet result = preparedStatement.executeQuery()) {
 					while (result.next()) {
 						Ville ville = new Ville();
-						ville.setCodeCommune(result.getString(CODE_COMMUNE));
+						ville.setCodeCommune(codeCommune);
 						ville.setNomCommune(result.getString(NOM));
-						ville.setCodePostal(postalCode);
-						ville.setLibelleAcheminement(LIBELLE_ACHEMINEMENT);
+						ville.setCodePostal(result.getString(CODE_POSTAL));
+						ville.setLibelleAcheminement(result.getString(LIBELLE_ACHEMINEMENT));
 						ville.setLigne(result.getString(LIGNE));
 						Coordonnee coord = new Coordonnee(result.getString(LATITUDE), result.getString(LONGITUDE));
 						ville.setCoordonnee(coord);
@@ -129,15 +130,30 @@ public class VilleDAOImpl implements VilleDAO {
 		return "La ville : " + codeCommune + nom + codePostal + libelle + ligne + latitude +longitude +"";
 	}	
 	
-	public String updateVille(String codeCommune, String nom) {
-		String sql = "UPDATE ville_france SET Nom_commune = ? WHERE Code_commune_INSEE = ?;";
+	public String updateVille(@RequestParam(required = true, value="codeCommune") String codeCommune,
+            @RequestParam(required = true, value="nomCommune") String nomCommune,
+            @RequestParam(required = true, value="codePostal") String codePostal,
+            @RequestParam(required = true, value="libelleAcheminement") String libelleAcheminement,
+            @RequestParam(required = true, value="ligne") String ligne,
+            @RequestParam(required = true, value="latitude") String latitude,
+            @RequestParam(required = true, value="longitude") String longitude) {
+		
+		String sql = "UPDATE ville_france SET Nom_commune = ?, Code_postal = ?, Libelle_acheminement = ?, Ligne_5 = ?, Latitude = ?, Longitude = ? WHERE Code_commune_INSEE = ?;";
 
 		try (Connection co = daoFactory.getConnection()) {
 
 			try (PreparedStatement ps = co.prepareStatement(sql)) {
 				
-				ps.setString(1, nom);
-				ps.setString(2, codeCommune);
+				ps.setString(1, nomCommune);
+				ps.setString(2, codePostal);
+				ps.setString(3, libelleAcheminement);
+				ps.setString(4, ligne);
+				ps.setString(5, latitude);
+				ps.setString(6, longitude);
+				ps.setString(7, codeCommune);
+				
+//				ps.setString(1, nomCommune);
+//				ps.setString(2, codeCommune);
 
 				ps.executeUpdate();
 			}
@@ -146,7 +162,7 @@ public class VilleDAOImpl implements VilleDAO {
 			LOG.fatal(e);
 		}
 		
-		return "L'update a bien été réalisé : "+ codeCommune + " a pour nouveau nom " + nom +"";
+		return "L'update a bien été réalisé" + nomCommune + "";
 	}	
 	
 	public String removeVille(String codeCommune) {
